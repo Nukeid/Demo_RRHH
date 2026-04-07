@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NogueraRRHH — Gestión de RRHH</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    @keyframes slideIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ─── Login Page ─── */
+    #loginPage {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #loginPage.show { display: flex; }
+
+    .login-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+    }
+    .login-card .brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-card .brand h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .login-card .brand span {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .login-card .form-group { margin-bottom: 18px; }
+    .login-card label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .login-card .form-control { width: 100%; }
+    .login-card .btn-login {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      margin-top: 8px;
+    }
+    .login-error {
+      color: var(--danger);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ LOGIN PAGE ═══ -->
+  <div id="loginPage" class="show">
+    <div class="login-card">
+      <div class="brand">
+        <h1>NogueraRRHH</h1>
+        <span>Sistema de Gestión de Recursos Humanos</span>
+      </div>
+      <form id="formLogin" onsubmit="App.doLogin(event)">
+        <div class="form-group">
+          <label>Usuario</label>
+          <input class="form-control" id="loginUsername" name="username" placeholder="usuario" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input class="form-control" id="loginPassword" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-login">Ingresar</button>
+        <div class="login-error" id="loginError"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <h1>NogueraRRHH</h1>
+      <span>Gestión de Personal</span>
+    </div>
+
+    <!-- DATOS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Datos</div>
+      <div class="sidebar-item" data-view="dashboard" data-cat="datos">
+        <span class="icon">📊</span> <span>Dashboard</span>
+      </div>
+      <div class="sidebar-item" data-view="empresa" data-cat="datos">
+        <span class="icon">🏢</span> <span>Datos Empresa</span>
+      </div>
+      <div class="sidebar-item" data-view="personal" data-cat="datos">
+        <span class="icon">👥</span> <span>Datos Personal</span>
+      </div>
+    </div>
+
+    <!-- GESTIÓN -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Gestión</div>
+      <div class="sidebar-item" data-view="gestion" data-cat="gestion">
+        <span class="icon">📋</span> <span>Gestión Laboral</span>
+      </div>
+      <div class="sidebar-item" data-view="sso" data-cat="gestion">
+        <span class="icon">🛡️</span> <span>Gestión SSO</span>
+      </div>
+    </div>
+
+    <!-- HERRAMIENTAS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Herramientas</div>
+      <div class="sidebar-item" data-view="herramientas" data-cat="herramientas">
+        <span class="icon">🛠️</span> <span>Herramientas</span>
+      </div>
+    </div>
+
+    <!-- SOPORTE -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Soporte</div>
+      <div class="sidebar-item" data-view="anexos" data-cat="soporte">
+        <span class="icon">📎</span> <span>Anexos</span>
+      </div>
+      <div class="sidebar-item" data-view="alertas" data-cat="gestion">
+        <span class="icon">🔔</span> <span>Alertas</span>
+      </div>
+    </div>
+
+    <!-- ADMINISTRACIÓN (solo admin) -->
+    <div class="sidebar-section" id="sectionAdmin" style="display:none">
+      <div class="sidebar-section-label">Administración</div>
+      <div class="sidebar-item" data-view="usuarios" data-cat="soporte">
+        <span class="icon">👤</span> <span>Usuarios</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <div id="userInfo" style="font-size:12px;color:var(--text-sidebar);margin-bottom:10px;padding:0 4px"></div>
+      <button class="theme-toggle" id="themeToggle">
+        <span class="icon">🌙</span> Tema Oscuro
+      </button>
+      <button class="theme-toggle" id="btnLogout" style="margin-top:6px;color:#e85d4a" onclick="App.logout()">
+        <span class="icon">🚪</span> Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main-content" id="mainContent">
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/charts.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

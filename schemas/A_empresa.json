@@ -1,0 +1,74 @@
+{
+  "modulo": "A",
+  "nombre": "DATOS DE LA EMPRESA",
+  "color": "#e1f5ee",
+  "categoria": "DATOS",
+  "estructura": {
+    "ruc": { "tipo": "string", "requerido": true, "etiqueta": "RUC" },
+    "identificacion": {
+      "razon_social": { "tipo": "string", "requerido": true, "etiqueta": "Razón Social" },
+      "nombre_fantasia": { "tipo": "string", "requerido": false, "etiqueta": "Nombre Fantasía" },
+      "tipo_sociedad": { "tipo": "string", "requerido": true, "etiqueta": "Tipo de Sociedad" },
+      "segun_dnit": { "tipo": "string", "requerido": false, "etiqueta": "Según DNIT" }
+    },
+    "actividad": {
+      "unipersonal_juridica": {
+        "tipo": "select",
+        "opciones": ["Unipersonal", "Jurídica"],
+        "etiqueta": "Tipo Empresa"
+      },
+      "principal": {
+        "descripcion": { "tipo": "string", "etiqueta": "Actividad Principal" },
+        "segun_dnit": { "tipo": "string", "etiqueta": "Código DNIT Principal" }
+      },
+      "secundaria": {
+        "descripcion": { "tipo": "string", "etiqueta": "Actividad Secundaria" },
+        "segun_dnit": { "tipo": "string", "etiqueta": "Código DNIT Secundario" }
+      }
+    },
+    "ubicacion_contacto": {
+      "direccion": {
+        "calle": { "tipo": "string", "etiqueta": "Calle" },
+        "barrio": { "tipo": "string", "etiqueta": "Barrio" },
+        "ciudad": { "tipo": "string", "etiqueta": "Ciudad" },
+        "depto": { "tipo": "string", "etiqueta": "Departamento" }
+      },
+      "correo_electronico": { "tipo": "email", "etiqueta": "Correo Electrónico" }
+    },
+    "representante_legal": {
+      "nombre_apellido": { "tipo": "string", "requerido": true, "etiqueta": "Nombre y Apellido" },
+      "cedula_identidad": { "tipo": "string", "requerido": true, "etiqueta": "Cédula de Identidad" },
+      "telefono": { "tipo": "string", "etiqueta": "Teléfono" },
+      "celular": { "tipo": "string", "etiqueta": "Celular" },
+      "correo_electronico": { "tipo": "email", "etiqueta": "Correo Electrónico" }
+    },
+    "registro_patronal": {
+      "n_patronal_ips": { "tipo": "string", "etiqueta": "N° Patronal IPS" },
+      "n_mtess_matriz": { "tipo": "string", "etiqueta": "N° MTESS Matriz" },
+      "n_mtess_sucursal": { "tipo": "string", "etiqueta": "N° MTESS Sucursal" }
+    },
+    "categorizacion": {
+      "facturacion_anio_anterior": { "tipo": "number", "etiqueta": "Facturación Año Anterior (Gs.)" },
+      "dnit": {
+        "categoria": {
+          "tipo": "select",
+          "opciones": ["Micro", "Pequeña", "Mediana", "Grande"],
+          "etiqueta": "Categoría DNIT"
+        },
+        "cantidad_trabajadores": { "tipo": "number", "etiqueta": "Cantidad de Trabajadores" }
+      },
+      "mtess": {
+        "categoria": {
+          "tipo": "select",
+          "opciones": ["Micro", "Pequeña", "Mediana", "Grande"],
+          "etiqueta": "Categoría MTESS"
+        }
+      }
+    },
+    "mipymes": {
+      "cedula": { "tipo": "string", "etiqueta": "Cédula MiPyMES" },
+      "grande": { "tipo": "boolean", "etiqueta": "¿Es Grande?" },
+      "fecha_expedicion": { "tipo": "date", "etiqueta": "Fecha de Expedición" }
+    }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "modulo": "E",
+  "nombre": "HERRAMIENTAS",
+  "color": "#e6e1fb",
+  "categoria": "HERRAMIENTAS",
+  "submodulos": {
+
+    "E1_calculadora_liquidacion": {
+      "nombre": "Calculadora - Planilla de Liquidación Final",
+      "estructura": {
+        "datos_empleador": {
+          "razon_social_o_nombre": { "tipo": "string", "etiqueta": "Razón Social / Nombre" }
+        },
+        "datos_trabajador": {
+          "nombre_completo": { "tipo": "string", "etiqueta": "Nombre Completo" },
+          "ci": { "tipo": "string", "etiqueta": "Cédula de Identidad" },
+          "cargo": { "tipo": "string", "etiqueta": "Cargo" },
+          "fecha_ingreso": { "tipo": "date", "etiqueta": "Fecha de Ingreso" },
+          "fecha_salida": { "tipo": "date", "etiqueta": "Fecha de Salida" },
+          "antiguedad_calculo": { "tipo": "string", "etiqueta": "Antigüedad (para cálculo)" },
+          "motivo_desvinculacion": {
+            "tipo": "select",
+            "opciones": ["Despido injustificado", "Renuncia", "Mutuo acuerdo", "Fin de contrato", "Otro"],
+            "etiqueta": "Motivo de Desvinculación"
+          }
+        },
+        "salarios_referencia": {
+          "salario_percibido_gs": { "tipo": "number", "etiqueta": "Salario Percibido (Gs.)" },
+          "promedio_ultimos_6_meses_gs": { "tipo": "number", "etiqueta": "Promedio últimos 6 meses (Gs.)", "calculado": true },
+          "smlv_gs": { "tipo": "number", "etiqueta": "SMLV (Gs.)", "default": 2899048 },
+          "salario_diario_mensual_gs": { "tipo": "number", "etiqueta": "Salario diario mensual (Gs.)", "calculado": true },
+          "salario_diario_jornalero_gs": { "tipo": "number", "etiqueta": "Salario diario jornalero (Gs.)", "calculado": true },
+          "salario_por_hora_gs": { "tipo": "number", "etiqueta": "Salario por hora (Gs.)", "calculado": true }
+        },
+        "beneficios": {
+          "preaviso_gs": { "tipo": "number", "etiqueta": "Preaviso (Gs.)", "calculado": true },
+          "antiguedad_gs": { "tipo": "number", "etiqueta": "Antigüedad (Gs.)", "calculado": true },
+          "vacacion_causada_gs": { "tipo": "number", "etiqueta": "Vacación causada (Gs.)", "calculado": true },
+          "vacacion_proporcional_gs": { "tipo": "number", "etiqueta": "Vacación proporcional (Gs.)", "calculado": true },
+          "aguinaldo_gs": { "tipo": "number", "etiqueta": "Aguinaldo (Gs.)", "calculado": true },
+          "aguinaldo_proporcional_gs": { "tipo": "number", "etiqueta": "Aguinaldo proporcional (Gs.)", "calculado": true },
+          "salario_del_mes_gs": { "tipo": "number", "etiqueta": "Salario del mes (Gs.)" }
+        },
+        "otros_haberes": {
+          "reajuste_salarial_gs": { "tipo": "number", "etiqueta": "Reajuste salarial (Gs.)" },
+          "horas_extras_gs": { "tipo": "number", "etiqueta": "Horas extras (Gs.)" },
+          "horas_nocturnas_gs": { "tipo": "number", "etiqueta": "Horas nocturnas (Gs.)" },
+          "feriados_gs": { "tipo": "number", "etiqueta": "Feriados (Gs.)" }
+        },
+        "resumen": {
+          "subtotal_gs": { "tipo": "number", "calculado": true },
+          "descuento_ips_9pct_gs": { "tipo": "number", "calculado": true },
+          "total_a_cobrar_gs": { "tipo": "number", "calculado": true }
+        }
+      }
+    },
+
+    "E2_cuantificacion_incumplimientos": {
+      "nombre": "Cuantificación de Incumplimientos",
+      "descripcion": "Consolida la cantidad de respuestas 'Falta' por cada apartado de gestión laboral",
+      "secciones": {
+        "contrato_laboral": {
+          "etiqueta": "Contrato Laboral",
+          "grupos": ["pasos_1_3", "pasos_4_6", "pasos_7_9", "pasos_10_13"]
+        },
+        "seguridad_social_ips": {
+          "etiqueta": "Seguridad Social (IPS)",
+          "grupos": ["paso_1"]
+        },
+        "horario_efectivo": {
+          "etiqueta": "Horario Efectivo",
+          "articulos": ["194", "196"],
+          "grupos": ["registro_asistencia", "jornada_diurna", "jornada_nocturna", "jornada_mixta"]
+        },
+        "salario_minimo": {
+          "etiqueta": "Salario Mínimo Legal Vigente",
+          "articulos": ["228", "235"],
+          "grupos": ["pasos_1_5", "pasos_6_11", "pasos_12_17"]
+        },
+        "vacaciones": {
+          "etiqueta": "Vacaciones",
+          "articulos": ["218", "219", "220", "222", "223", "224"],
+          "grupos": ["pasos_1_6", "pasos_7_12", "pasos_13_18"]
+        },
+        "aguinaldo": {
+          "etiqueta": "Aguinaldo",
+          "articulos": ["243"],
+          "grupos": ["pasos_1_5"]
+        }
+      },
+      "cuadro_resumen": {
+        "por_seccion": {
+          "pasos_completados": 0,
+          "pasos_faltantes": 0,
+          "porcentaje": 0
+        },
+        "total_general": {
+          "pasos_completados": 0,
+          "pasos_faltantes": 0,
+          "porcentaje": 0,
+          "total_incumplimientos": 0
+        }
+      }
+    },
+
+    "E3_ahorro_aguinaldo": {
+      "nombre": "Ahorro Programado - Aguinaldo",
+      "titulo_tabla": "TABLA DE AHORRO MENSUAL PARA PAGO DE AGUINALDO – FIN DE AÑO",
+      "estructura_por_trabajador": {
+        "trabajador": { "tipo": "string", "etiqueta": "Nombre y Apellido" },
+        "cargo": { "tipo": "string", "etiqueta": "Cargo" },
+        "ingreso_mensual_gs": { "tipo": "number", "etiqueta": "Ingreso Mensual (Gs.)" },
+        "meses_trabajados": { "tipo": "number", "etiqueta": "Meses Trabajados" },
+        "tipo_aguinaldo": {
+          "tipo": "select",
+          "opciones": ["Completo (12 meses)", "Proporcional"],
+          "etiqueta": "Tipo de Aguinaldo"
+        },
+        "ahorro_mensual": {
+          "meses": ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
+          "tipo": "number",
+          "etiqueta_cada_mes": "Ahorro mensual (Gs.)"
+        },
+        "ahorro_acumulado": { "tipo": "number", "calculado": true, "etiqueta": "Ahorro Acumulado (Gs.)" },
+        "aguinaldo_total": { "tipo": "number", "calculado": true, "etiqueta": "Aguinaldo Total (Gs.)" }
+      },
+      "formulas": {
+        "aguinaldo_completo": "ingreso_mensual ÷ 12 × 12 = ingreso_mensual",
+        "aguinaldo_proporcional": "ingreso_mensual ÷ 12 × meses_trabajados",
+        "ahorro_mensual": "ingreso_mensual ÷ 12",
+        "ahorro_acumulado": "suma de ahorros mensuales enero a diciembre"
+      }
+    }
+  }
+}

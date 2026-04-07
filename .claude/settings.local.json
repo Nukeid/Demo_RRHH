@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(node -e \":*)",
+      "Bash(node --check /home/nukeid/programming/Noguera/RRHH/noguera-rrhh/public/js/app.js)",
+      "Bash(node --check /home/nukeid/programming/Noguera/RRHH/noguera-rrhh/server/routes/auth.js)",
+      "Bash(node --check /home/nukeid/programming/Noguera/RRHH/noguera-rrhh/server/middleware/auth.js)"
+    ]
+  }
+}
