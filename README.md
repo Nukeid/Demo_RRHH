@@ -1,4 +1,4 @@
-# NogueraRRHH — SaaS de Gestión de RRHH (Paraguay)
+# SaaS de Gestión de RRHH (Paraguay)
 
 ## Arquitectura del Proyecto
 
