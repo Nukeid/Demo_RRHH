@@ -1,0 +1,415 @@
+{
+  "modulo": "C",
+  "nombre": "GESTIÓN LABORAL",
+  "color": "#faece7",
+  "categoria": "GESTION",
+  "submodulos": {
+
+    "C1_contrato": {
+      "nombre": "Contrato Laboral",
+      "pasos": {
+        "paso_1": {
+          "campo": "relacion_juridica",
+          "etiqueta": "Relación jurídica entre sujetos",
+          "tipo": "select",
+          "opciones": ["Individual", "Colectivo", "Grupo"]
+        },
+        "paso_2": {
+          "campo": "clase_contrato",
+          "etiqueta": "Clase de contrato",
+          "tipo": "select",
+          "opciones": ["Escrito", "Verbal"]
+        },
+        "paso_3": {
+          "campo": "condicion_contrato",
+          "etiqueta": "Condición del contrato",
+          "tipo": "select",
+          "opciones": ["Superior al SMLV", "SMLV", "Menor al SMLV"]
+        },
+        "paso_4": {
+          "campo": "redactado",
+          "etiqueta": "¿Está redactado?",
+          "tipo": "si_no"
+        },
+        "paso_5": {
+          "campo": "contenido_verificado",
+          "etiqueta": "Contenido del contrato verificado",
+          "tipo": "checklist",
+          "items": [
+            "Lugar y fecha de celebración",
+            "Nombres y datos personales",
+            "Clase de trabajo o servicio",
+            "Lugar de prestación",
+            "Monto, forma y período de pago",
+            "Duración y jornada",
+            "Beneficios del empleador",
+            "Estipulaciones convenidas",
+            "Firma de contratantes"
+          ]
+        },
+        "paso_6": {
+          "campo": "copia_entregada",
+          "etiqueta": "¿Copia entregada al trabajador?",
+          "tipo": "si_no"
+        },
+        "paso_7": {
+          "campo": "duracion",
+          "etiqueta": "Duración del contrato",
+          "tipo": "select",
+          "opciones": ["Indefinido", "Por obra o servicio", "Plazo determinado", "Otro"]
+        },
+        "paso_8": {
+          "campo": "modalidad",
+          "etiqueta": "Modalidad del contrato",
+          "tipo": "select",
+          "opciones": ["General", "Doméstico", "Rural", "Transporte", "Aprendizaje", "Tiempo parcial", "Colectivo", "Otro"]
+        },
+        "paso_9": {
+          "campo": "homologado",
+          "etiqueta": "¿Homologado?",
+          "tipo": "select",
+          "opciones": ["Sí", "No", "No aplica"]
+        },
+        "paso_10_11": {
+          "campo": "forma_pago",
+          "etiqueta": "Forma de pago",
+          "tipo": "multi_select",
+          "opciones": ["A sueldo", "A jornal", "A comisión"]
+        },
+        "paso_12": {
+          "campo": "tiempo_pago",
+          "etiqueta": "Tiempo de pago",
+          "tipo": "select",
+          "opciones": ["Mes", "Quincena", "Semana", "A destajo", "Día"]
+        },
+        "paso_13": {
+          "campo": "documentacion_adjunta",
+          "etiqueta": "¿Documentación adjunta?",
+          "tipo": "select",
+          "opciones": ["Sí", "No", "N/A"]
+        }
+      },
+      "total_pasos": 13
+    },
+
+    "C2_seguridad_social": {
+      "nombre": "Seguridad Social (IPS)",
+      "pasos": {
+        "paso_1": {
+          "campo": "afiliacion_ips",
+          "etiqueta": "¿Afiliado al IPS?",
+          "tipo": "si_no"
+        },
+        "fecha_ingreso": {
+          "campo": "fecha_ingreso_ips",
+          "etiqueta": "Fecha de ingreso IPS",
+          "tipo": "date"
+        },
+        "fecha_salida": {
+          "campo": "fecha_salida_ips",
+          "etiqueta": "Fecha de salida IPS",
+          "tipo": "date"
+        },
+        "estado": {
+          "campo": "estado_ips",
+          "etiqueta": "Estado en IPS",
+          "tipo": "select",
+          "opciones": ["Activo", "Inactivo"]
+        }
+      },
+      "total_pasos": 1
+    },
+
+    "C3_horario_efectivo": {
+      "nombre": "Horario Efectivo",
+      "articulos_referencia": ["194", "196"],
+      "pasos": {
+        "paso_1": {
+          "campo": "registro_asistencia",
+          "etiqueta": "¿Registra asistencia?",
+          "tipo": "select",
+          "opciones": ["Sí", "No", "No aplica"]
+        },
+        "paso_1b": {
+          "campo": "metodo_registro",
+          "etiqueta": "Método de registro",
+          "tipo": "select",
+          "opciones": ["Planilla manual", "Reloj biométrico"]
+        },
+        "paso_2": {
+          "campo": "jornada_diurna",
+          "etiqueta": "¿Aplica jornada diurna (06:00–18:00)?",
+          "tipo": "si_no_na"
+        },
+        "paso_3": {
+          "campo": "diurna_excede_8h",
+          "etiqueta": "¿Excede 8 horas diarias?",
+          "tipo": "si_no_na"
+        },
+        "paso_4": {
+          "campo": "diurna_excede_48h",
+          "etiqueta": "¿Excede 48 horas semanales?",
+          "tipo": "si_no_na"
+        },
+        "paso_5": {
+          "campo": "jornada_nocturna",
+          "etiqueta": "¿Aplica jornada nocturna (20:00–06:00)?",
+          "tipo": "si_no_na"
+        },
+        "paso_6": {
+          "campo": "nocturna_excede_7h",
+          "etiqueta": "¿Excede 7 horas diarias nocturnas?",
+          "tipo": "si_no_na"
+        },
+        "paso_7": {
+          "campo": "nocturna_excede_42h",
+          "etiqueta": "¿Excede 42 horas semanales nocturnas?",
+          "tipo": "si_no_na"
+        },
+        "paso_8": {
+          "campo": "mixta_excede_7_5h",
+          "etiqueta": "¿Jornada mixta excede 7.5h diarias?",
+          "tipo": "si_no_na"
+        },
+        "paso_9": {
+          "campo": "mixta_excede_45h",
+          "etiqueta": "¿Jornada mixta excede 45h semanales?",
+          "tipo": "si_no_na"
+        },
+        "paso_10": {
+          "campo": "dia_libre",
+          "etiqueta": "¿Tiene día libre semanal?",
+          "tipo": "si_no"
+        }
+      },
+      "total_pasos": 10
+    },
+
+    "C4_salario_minimo": {
+      "nombre": "Salario Mínimo Legal Vigente",
+      "articulos_referencia": ["228", "235"],
+      "pasos": {
+        "paso_1": {
+          "campo": "cumple_smlv",
+          "etiqueta": "¿Cumple con el SMLV?",
+          "tipo": "si_no_na"
+        },
+        "paso_2": {
+          "campo": "confeccion_recibo",
+          "etiqueta": "¿Se confecciona recibo de pago?",
+          "tipo": "si_no_na"
+        },
+        "paso_3": {
+          "campo": "salario_basico_correcto",
+          "etiqueta": "¿Salario básico correcto?",
+          "tipo": "si_no_na"
+        },
+        "paso_4": {
+          "campo": "jornadas_horas",
+          "etiqueta": "¿Jornadas y horas trabajadas correctas?",
+          "tipo": "si_no_na"
+        },
+        "paso_5": {
+          "campo": "incrementos",
+          "etiqueta": "¿Incrementos aplicados?",
+          "tipo": "si_no_na"
+        },
+        "paso_6": {
+          "campo": "concepto_descuentos",
+          "etiqueta": "¿Concepto de descuentos correcto?",
+          "tipo": "si_no_na"
+        },
+        "paso_7": {
+          "campo": "firma_trabajador",
+          "etiqueta": "¿Firma del trabajador en recibo?",
+          "tipo": "si_no_na"
+        },
+        "paso_8": {
+          "campo": "horas_extras_50",
+          "etiqueta": "¿Horas extras +50% aplicadas?",
+          "tipo": "si_no_na"
+        },
+        "paso_9": {
+          "campo": "horas_nocturnas_30",
+          "etiqueta": "¿Recargo nocturno +30%?",
+          "tipo": "si_no_na"
+        },
+        "paso_10": {
+          "campo": "extras_nocturnas_100",
+          "etiqueta": "¿Extras nocturnas +100%?",
+          "tipo": "si_no_na"
+        },
+        "paso_11": {
+          "campo": "feriados_100",
+          "etiqueta": "¿Feriados +100%?",
+          "tipo": "si_no_na"
+        },
+        "paso_12": {
+          "campo": "indemnizacion_perdidas",
+          "etiqueta": "¿Indemnización por pérdidas?",
+          "tipo": "si_no_na"
+        },
+        "paso_13": {
+          "campo": "anticipo_salario",
+          "etiqueta": "¿Anticipo de salario?",
+          "tipo": "si_no_na"
+        },
+        "paso_14": {
+          "campo": "descuento_ips",
+          "etiqueta": "¿Descuento IPS 9%?",
+          "tipo": "si_no_na"
+        },
+        "paso_15": {
+          "campo": "cuotas_sindicales",
+          "etiqueta": "¿Cuotas sindicales/cooperativas?",
+          "tipo": "si_no_na"
+        },
+        "paso_16": {
+          "campo": "nota_autorizacion",
+          "etiqueta": "¿Nota de autorización del trabajador?",
+          "tipo": "si_no_na"
+        },
+        "paso_17": {
+          "campo": "descuento_judicial",
+          "etiqueta": "¿Descuento judicial?",
+          "tipo": "si_no_na"
+        }
+      },
+      "total_pasos": 17
+    },
+
+    "C5_vacaciones": {
+      "nombre": "Vacaciones",
+      "articulos_referencia": ["218", "219", "220", "222", "223", "224"],
+      "pasos": {
+        "paso_1": {
+          "campo": "supero_180_dias",
+          "etiqueta": "¿Superó 180 días trabajados?",
+          "tipo": "si_no_na"
+        },
+        "paso_2": {
+          "campo": "duracion_correspondiente",
+          "etiqueta": "Duración correspondiente (días)",
+          "tipo": "select",
+          "opciones": ["12", "18", "30", "No aplica"]
+        },
+        "paso_3": {
+          "campo": "utilizo_vacaciones",
+          "etiqueta": "¿Utilizó vacaciones?",
+          "tipo": "si_no_na"
+        },
+        "paso_4": {
+          "campo": "cantidad_utilizada",
+          "etiqueta": "Cantidad utilizada (días)",
+          "tipo": "select",
+          "opciones": ["12", "18", "30", "No aplica"]
+        },
+        "paso_5": {
+          "campo": "tiene_pendiente",
+          "etiqueta": "¿Tiene vacaciones pendientes?",
+          "tipo": "si_no_na"
+        },
+        "paso_6": {
+          "campo": "cantidad_pendiente",
+          "etiqueta": "Cantidad pendiente (días)",
+          "tipo": "number"
+        },
+        "paso_7": {
+          "campo": "se_concedio",
+          "etiqueta": "¿Se concedió?",
+          "tipo": "si_no_na"
+        },
+        "paso_8": {
+          "campo": "constancia_comunicacion",
+          "etiqueta": "¿Constancia de comunicación?",
+          "tipo": "si_no_na"
+        },
+        "paso_9": {
+          "campo": "se_pago",
+          "etiqueta": "¿Se le pagó?",
+          "tipo": "si_no_na"
+        },
+        "paso_10": {
+          "campo": "pago_antes_salir",
+          "etiqueta": "¿Pago antes de salir?",
+          "tipo": "si_no_na"
+        },
+        "paso_11": {
+          "campo": "recibo_pago",
+          "etiqueta": "¿Recibo de pago?",
+          "tipo": "si_no_na"
+        },
+        "paso_12": {
+          "campo": "copia_trabajador",
+          "etiqueta": "¿Copia entregada al trabajador?",
+          "tipo": "si_no_na"
+        },
+        "paso_13": {
+          "campo": "fuera_de_plazo",
+          "etiqueta": "¿Otorgadas después del plazo?",
+          "tipo": "si_no_na"
+        },
+        "paso_14": {
+          "campo": "pago_doble",
+          "etiqueta": "¿Se pagó doble?",
+          "tipo": "si_no_na"
+        },
+        "paso_15": {
+          "campo": "pago_doble_antes_salir",
+          "etiqueta": "¿Pago doble antes de salir?",
+          "tipo": "si_no_na"
+        },
+        "paso_16": {
+          "campo": "recibo_pago_doble",
+          "etiqueta": "¿Recibo de pago doble?",
+          "tipo": "si_no_na"
+        },
+        "paso_17": {
+          "campo": "acumulable",
+          "etiqueta": "¿Vacaciones acumulables?",
+          "tipo": "si_no_na"
+        },
+        "paso_18": {
+          "campo": "constancia_peticion",
+          "etiqueta": "¿Constancia de petición del trabajador?",
+          "tipo": "si_no_na"
+        }
+      },
+      "total_pasos": 18
+    },
+
+    "C6_aguinaldo": {
+      "nombre": "Aguinaldo",
+      "articulos_referencia": ["243"],
+      "pasos": {
+        "paso_1": {
+          "campo": "se_pago",
+          "etiqueta": "¿Se pagó el aguinaldo?",
+          "tipo": "si_no_na"
+        },
+        "paso_2": {
+          "campo": "tipo_aguinaldo",
+          "etiqueta": "Tipo de aguinaldo",
+          "tipo": "select",
+          "opciones": ["Total", "Proporcional"]
+        },
+        "paso_3": {
+          "campo": "recibo_pago",
+          "etiqueta": "¿Recibo de pago?",
+          "tipo": "si_no_na"
+        },
+        "paso_4": {
+          "campo": "copia_trabajador",
+          "etiqueta": "¿Copia entregada al trabajador?",
+          "tipo": "si_no_na"
+        },
+        "paso_5": {
+          "campo": "antes_31_diciembre",
+          "etiqueta": "¿Pagado antes del 31 de diciembre?",
+          "tipo": "si_no_na"
+        }
+      },
+      "total_pasos": 5
+    }
+  }
+}

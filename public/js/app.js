@@ -1198,4 +1198,10 @@ function fmt(n) {
 }
 
 // ─── Init ───────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => App.init());
+document.addEventListener('DOMContentLoaded', () => {
+  if (DEMO_MODE) {
+    const hint = document.getElementById('demoHint');
+    if (hint) hint.style.display = 'block';
+  }
+  App.init();
+});

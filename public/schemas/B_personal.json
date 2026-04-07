@@ -1,0 +1,59 @@
+{
+  "modulo": "B",
+  "nombre": "DATOS DEL PERSONAL",
+  "color": "#e1f5ee",
+  "categoria": "DATOS",
+  "estructura": {
+    "condicion": {
+      "tipo": {
+        "tipo": "select",
+        "opciones": ["Pre ingreso", "Ingreso"],
+        "etiqueta": "Condición"
+      },
+      "cedula": { "tipo": "string", "requerido": true, "etiqueta": "Cédula de Identidad" }
+    },
+    "identificacion": {
+      "nombre_apellido": { "tipo": "string", "requerido": true, "etiqueta": "Nombre y Apellido" },
+      "nacionalidad": { "tipo": "string", "etiqueta": "Nacionalidad" },
+      "estado_civil": {
+        "tipo": "select",
+        "opciones": ["Casado", "Soltero", "Viudo", "Divorciado"],
+        "etiqueta": "Estado Civil"
+      },
+      "hijos_menores": {
+        "tiene": { "tipo": "boolean", "etiqueta": "¿Tiene hijos menores?" },
+        "cantidad": { "tipo": "number", "etiqueta": "Cantidad de hijos menores" }
+      },
+      "cargo": { "tipo": "string", "requerido": true, "etiqueta": "Cargo" }
+    },
+    "funcion": {
+      "modulo": { "tipo": "number", "etiqueta": "Módulo" },
+      "subgrupo_unico": { "tipo": "string", "etiqueta": "Subgrupo Único" },
+      "sector": { "tipo": "string", "etiqueta": "Sector" },
+      "direccion": {
+        "domicilio": {
+          "calle": { "tipo": "string", "etiqueta": "Calle" },
+          "barrio": { "tipo": "string", "etiqueta": "Barrio" },
+          "dpto": { "tipo": "string", "etiqueta": "Departamento" }
+        }
+      }
+    },
+    "ubicacion_contacto": {
+      "ciudad": { "tipo": "string", "etiqueta": "Ciudad" },
+      "telefono": { "tipo": "string", "etiqueta": "Teléfono" },
+      "contacto": {
+        "tipo_contacto": {
+          "tipo": "select",
+          "opciones": ["Particular", "Familiar"],
+          "etiqueta": "Tipo de Contacto"
+        },
+        "correo_electronico": { "tipo": "email", "etiqueta": "Correo Electrónico" }
+      },
+      "fecha_ingreso": { "tipo": "date", "requerido": true, "etiqueta": "Fecha de Ingreso" }
+    },
+    "antiguedad": {
+      "actual": { "tipo": "string", "etiqueta": "Antigüedad Actual" },
+      "salida": { "tipo": "date", "etiqueta": "Fecha de Salida" }
+    }
+  }
+}

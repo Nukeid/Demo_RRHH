@@ -1,0 +1,15 @@
+{
+  "modulo": "D",
+  "nombre": "GESTIÓN SSO (Salud y Seguridad Ocupacional)",
+  "color": "#faece7",
+  "categoria": "GESTION",
+  "estado": "PRÓXIMAMENTE",
+  "descripcion": "Módulo en desarrollo. Cubrirá normas de salud y seguridad ocupacional según legislación paraguaya.",
+  "submodulos_planificados": [
+    "Evaluación de riesgos laborales",
+    "Plan de emergencia",
+    "EPP (Equipos de Protección Personal)",
+    "Capacitaciones obligatorias",
+    "Registro de accidentes laborales"
+  ]
+}

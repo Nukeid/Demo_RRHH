@@ -1,0 +1,33 @@
+{
+  "modulo": "F",
+  "nombre": "ANEXOS",
+  "color": "#f1efe8",
+  "categoria": "SOPORTE",
+  "estado": "PRÓXIMAMENTE",
+  "submodulos_planificados": [
+    {
+      "id": "F1",
+      "nombre": "Guardería",
+      "estado": "pendiente",
+      "descripcion": "Obligaciones sobre guardería según legislación laboral paraguaya"
+    },
+    {
+      "id": "F2",
+      "nombre": "Restricciones Trabajo Nocturno",
+      "estado": "pendiente",
+      "descripcion": "Normativa sobre trabajo nocturno, menores de edad, embarazadas"
+    },
+    {
+      "id": "F3",
+      "nombre": "RIT (Reglamento Interno de Trabajo)",
+      "estado": "pendiente",
+      "descripcion": "Requisitos para confección y homologación del RIT"
+    },
+    {
+      "id": "F4",
+      "nombre": "Sala de Lactancia",
+      "estado": "pendiente",
+      "descripcion": "Obligaciones sobre sala de lactancia según ley vigente"
+    }
+  ]
+}
