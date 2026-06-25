@@ -11,13 +11,20 @@
       from { transform: translateX(40px); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+    @keyframes loginRise {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
     /* ─── Login Page ─── */
     #loginPage {
       display: none;
       position: fixed;
       inset: 0;
-      background: var(--bg-primary);
+      background:
+        radial-gradient(60% 50% at 15% 0%, color-mix(in srgb, var(--c-personal) 16%, transparent), transparent 60%),
+        radial-gradient(50% 50% at 100% 100%, color-mix(in srgb, var(--c-contrato) 14%, transparent), transparent 60%),
+        var(--bg-primary);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -25,21 +32,35 @@
     #loginPage.show { display: flex; }
 
     .login-card {
+      position: relative;
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: 20px;
+      border-radius: 22px;
       padding: 48px 40px;
       width: 100%;
       max-width: 420px;
       box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: loginRise 0.5s var(--ease) both;
+    }
+    /* Cinta cromática: las cinco familias del sistema */
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg,
+        var(--c-dashboard), var(--c-carga), var(--c-personal), var(--c-contrato), var(--c-sso), var(--c-alerta));
     }
     .login-card .brand {
       text-align: center;
       margin-bottom: 32px;
     }
     .login-card .brand h1 {
-      font-size: 26px;
+      font-family: 'Questrial', system-ui, sans-serif;
+      font-size: 27px;
       font-weight: 700;
+      letter-spacing: -0.8px;
       color: var(--text-primary);
     }
     .login-card .brand span {
@@ -85,7 +106,7 @@
         <button type="submit" class="btn btn-primary btn-login">Ingresar</button>
         <div class="login-error" id="loginError"></div>
         <div id="demoHint" style="display:none;margin-top:16px;padding:10px 14px;background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);border-radius:8px;font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.6">
-          🎭 <strong>Modo Demo</strong><br>
+          <strong>Modo Demo</strong><br>
           Usuario: <code style="background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px">admin</code> &nbsp;
           Contraseña: <code style="background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px">admin123</code>
         </div>
@@ -103,33 +124,33 @@
     <!-- DATOS -->
     <div class="sidebar-section">
       <div class="sidebar-section-label">Datos</div>
-      <div class="sidebar-item" data-view="dashboard" data-cat="datos">
-        <span class="icon">📊</span> <span>Dashboard</span>
+      <div class="sidebar-item" data-view="dashboard" data-cat="dashboard">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span> <span>Dashboard</span>
       </div>
-      <div class="sidebar-item" data-view="empresa" data-cat="datos">
-        <span class="icon">🏢</span> <span>Datos Empresa</span>
+      <div class="sidebar-item" data-view="empresa" data-cat="carga">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15"/><path d="M19 21V11a1 1 0 0 0-1-1h-3"/><path d="M9 8h2M9 12h2M9 16h2"/></svg></span> <span>Datos Empresa</span>
       </div>
-      <div class="sidebar-item" data-view="personal" data-cat="datos">
-        <span class="icon">👥</span> <span>Datos Personal</span>
+      <div class="sidebar-item" data-view="personal" data-cat="personal">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> <span>Datos Personal</span>
       </div>
     </div>
 
     <!-- GESTIÓN -->
     <div class="sidebar-section">
       <div class="sidebar-section-label">Gestión</div>
-      <div class="sidebar-item" data-view="gestion" data-cat="gestion">
-        <span class="icon">📋</span> <span>Gestión Laboral</span>
+      <div class="sidebar-item" data-view="gestion" data-cat="contrato">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span> <span>Gestión Laboral</span>
       </div>
-      <div class="sidebar-item" data-view="sso" data-cat="gestion">
-        <span class="icon">🛡️</span> <span>Gestión SSO</span>
+      <div class="sidebar-item" data-view="sso" data-cat="sso">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> <span>Gestión SSO</span>
       </div>
     </div>
 
     <!-- HERRAMIENTAS -->
     <div class="sidebar-section">
       <div class="sidebar-section-label">Herramientas</div>
-      <div class="sidebar-item" data-view="herramientas" data-cat="herramientas">
-        <span class="icon">🛠️</span> <span>Herramientas</span>
+      <div class="sidebar-item" data-view="herramientas" data-cat="carga">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.6L3 18l3 3 6.1-6.1a4 4 0 0 0 5.6-5.6l-2.9 2.9-2.1-2.1z"/></svg></span> <span>Herramientas</span>
       </div>
     </div>
 
@@ -137,18 +158,18 @@
     <div class="sidebar-section">
       <div class="sidebar-section-label">Soporte</div>
       <div class="sidebar-item" data-view="anexos" data-cat="soporte">
-        <span class="icon">📎</span> <span>Anexos</span>
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.5l-9.2 9.2a3 3 0 0 1-4.2-4.2l9.2-9.2a2 2 0 0 1 2.8 2.8l-9.2 9.2"/></svg></span> <span>Anexos</span>
       </div>
-      <div class="sidebar-item" data-view="alertas" data-cat="gestion">
-        <span class="icon">🔔</span> <span>Alertas</span>
+      <div class="sidebar-item" data-view="alertas" data-cat="alerta">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span> <span>Alertas</span>
       </div>
     </div>
 
     <!-- ADMINISTRACIÓN (solo admin) -->
     <div class="sidebar-section" id="sectionAdmin" style="display:none">
       <div class="sidebar-section-label">Administración</div>
-      <div class="sidebar-item" data-view="usuarios" data-cat="soporte">
-        <span class="icon">👤</span> <span>Usuarios</span>
+      <div class="sidebar-item" data-view="usuarios" data-cat="admin">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> <span>Usuarios</span>
       </div>
     </div>
 
@@ -156,10 +177,10 @@
     <div class="sidebar-footer">
       <div id="userInfo" style="font-size:12px;color:var(--text-sidebar);margin-bottom:10px;padding:0 4px"></div>
       <button class="theme-toggle" id="themeToggle">
-        <span class="icon">🌙</span> Tema Oscuro
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span> Tema Oscuro
       </button>
       <button class="theme-toggle" id="btnLogout" style="margin-top:6px;color:#e85d4a" onclick="App.logout()">
-        <span class="icon">🚪</span> Cerrar Sesión
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span> Cerrar Sesión
       </button>
     </div>
   </nav>

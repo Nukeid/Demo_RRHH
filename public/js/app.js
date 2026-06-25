@@ -1,5 +1,14 @@
 // ─── NogueraRRHH SPA App ────────────────────────
 
+// Iconos SVG reutilizables (sin emojis, heredan currentColor)
+const SVG = (paths) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+const ICON = {
+  sun:   SVG('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon:  SVG('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+  bell:  SVG('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'),
+  empty: SVG('<path d="M3 8l2.5-4h13L21 8"/><path d="M3 8h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 12h5l1.5 2.5h5L21 12"/>'),
+};
+
 const App = {
   currentView: 'dashboard',
   user: null,
@@ -7,6 +16,10 @@ const App = {
   empleados: [],
   alertas: [],
   charts: {},
+  _selectedGestionPersonalId: null,
+  _currentPersonalId: null,
+  _currentGestion: null,
+  _gestionSchema: null,
 
   async init() {
     this.bindTheme();
@@ -40,8 +53,7 @@ const App = {
     }
     const info = document.getElementById('userInfo');
     if (info) {
-      const badge = { admin: '🔑', editor: '✏️', viewer: '👁️' }[this.user.rol] || '';
-      info.innerHTML = `${badge} <strong>${this.user.username}</strong><br><span style="opacity:0.6;font-size:11px">${this.user.rol}</span>`;
+      info.innerHTML = `<strong>${this.user.username}</strong><br><span style="opacity:0.6;font-size:11px">${this.user.rol}</span>`;
     }
   },
 
@@ -69,6 +81,9 @@ const App = {
     this.empresa = null;
     this.empleados = [];
     this.alertas = [];
+    this._selectedGestionPersonalId = null;
+    this._currentPersonalId = null;
+    this._currentGestion = null;
     document.getElementById('sectionAdmin').style.display = 'none';
     this.showLoginPage();
   },
@@ -90,7 +105,10 @@ const App = {
     });
   },
 
-  navigate(view) {
+  navigate(view, options = {}) {
+    if (view === 'gestion' && Object.prototype.hasOwnProperty.call(options, 'personalId')) {
+      this._selectedGestionPersonalId = options.personalId ? String(options.personalId) : null;
+    }
     this.currentView = view;
     // Update active sidebar
     document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
@@ -119,7 +137,7 @@ const App = {
     const btn = document.getElementById('themeToggle');
     if (!btn) return;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.innerHTML = `<span class="icon">${isDark ? '☀️' : '🌙'}</span> ${isDark ? 'Tema Claro' : 'Tema Oscuro'}`;
+    btn.innerHTML = `<span class="icon">${isDark ? ICON.sun : ICON.moon}</span> ${isDark ? 'Tema Claro' : 'Tema Oscuro'}`;
   },
 
   // ─── Data loading ─────────────────────────────
@@ -167,8 +185,11 @@ const App = {
       default:              main.innerHTML = this.viewDashboard();
     }
 
-    // Initialize charts after DOM render
-    requestAnimationFrame(() => this.initChartsForView(view));
+    // Initialize view-specific behaviors after DOM render
+    requestAnimationFrame(() => {
+      if (view === 'gestion') this.initGestionView();
+      this.initChartsForView(view);
+    });
   },
 
   // ─── DASHBOARD ────────────────────────────────
@@ -180,15 +201,15 @@ const App = {
 
     return `
       <div class="topbar">
-        <h2>📊 Dashboard</h2>
+        <h2>Dashboard</h2>
         <div class="badge-alert" onclick="App.navigate('alertas')">
-          🔔 <span class="count" id="dashAlertCount" ${alertasPend > 0 ? '' : 'style="display:none"'}>${alertasPend}</span>
+          ${ICON.bell}<span class="count" id="dashAlertCount" ${alertasPend > 0 ? '' : 'style="display:none"'}>${alertasPend}</span>
         </div>
       </div>
 
       ${!emp ? `
         <div class="empty-state">
-          <div class="icon">🏢</div>
+          <div class="icon">${ICON.empty}</div>
           <h3>Bienvenido a NogueraRRHH</h3>
           <p>Comience registrando los datos de su empresa</p>
           <br>
@@ -196,38 +217,38 @@ const App = {
         </div>
       ` : `
         <div class="grid-4">
-          <div class="card kpi info" data-cat="datos">
+          <div class="card kpi" data-cat="personal">
             <div class="value">${total}</div>
             <div class="label">Empleados</div>
           </div>
-          <div class="card kpi success" data-cat="datos">
+          <div class="card kpi" data-cat="dashboard">
             <div class="value">${activos}</div>
             <div class="label">Activos</div>
           </div>
-          <div class="card kpi ${alertasPend > 3 ? 'danger' : 'warning'}" data-cat="gestion">
+          <div class="card kpi" data-cat="alerta">
             <div class="value">${alertasPend}</div>
             <div class="label">Alertas</div>
           </div>
-          <div class="card kpi info" data-cat="herramientas">
+          <div class="card kpi" data-cat="carga">
             <div class="value">${emp.categoria_dnit || '—'}</div>
             <div class="label">Categoría</div>
           </div>
         </div>
 
         <div class="grid-2">
-          <div class="card" data-cat="gestion">
+          <div class="card" data-cat="dashboard">
             <div class="card-header">
               <h3>Cumplimiento General</h3>
-              <span class="tag tag-gestion">Gestión</span>
+              <span class="tag tag-dashboard">Panorama</span>
             </div>
             <div class="chart-container">
               <canvas id="chartDonut"></canvas>
             </div>
           </div>
-          <div class="card" data-cat="gestion">
+          <div class="card" data-cat="dashboard">
             <div class="card-header">
               <h3>Cumplimiento por Módulo</h3>
-              <span class="tag tag-gestion">Gestión</span>
+              <span class="tag tag-dashboard">Panorama</span>
             </div>
             <div class="chart-container">
               <canvas id="chartRadar"></canvas>
@@ -235,7 +256,7 @@ const App = {
           </div>
         </div>
 
-        <div class="card" data-cat="gestion">
+        <div class="card" data-cat="dashboard">
           <div class="card-header">
             <h3>Detalle por Módulo</h3>
           </div>
@@ -245,14 +266,13 @@ const App = {
         </div>
 
         ${this.alertas.length > 0 ? `
-          <div class="card" data-cat="gestion">
+          <div class="card" data-cat="alerta">
             <div class="card-header">
-              <h3>⚠️ Últimas Alertas</h3>
+              <h3>Últimas Alertas</h3>
               <button class="btn btn-sm btn-outline" onclick="App.navigate('alertas')">Ver todas</button>
             </div>
             ${this.alertas.slice(0, 5).map(a => `
               <div class="alert-item ${a.nivel}">
-                <span>${a.nivel === 'danger' ? '🔴' : '🟡'}</span>
                 <div>
                   <div>${a.mensaje}</div>
                   <div class="time">${a.created_at}</div>
@@ -270,10 +290,10 @@ const App = {
     const emp = this.empresa || {};
     return `
       <div class="topbar">
-        <h2>🏢 Datos de la Empresa</h2>
-        <span class="tag tag-datos">Datos</span>
+        <h2>Datos de la Empresa</h2>
+        <span class="tag tag-carga">Carga de datos</span>
       </div>
-      <div class="card" data-cat="datos">
+      <div class="card" data-cat="carga">
         <form id="formEmpresa" onsubmit="App.saveEmpresa(event)">
           <div class="grid-3">
             <div class="form-group">
@@ -361,8 +381,8 @@ const App = {
 
           ${this.userCan('write') ? `
           <div style="margin-top:24px;display:flex;gap:12px">
-            <button type="submit" class="btn btn-success">💾 ${this.empresa ? 'Actualizar' : 'Registrar'} Empresa</button>
-          </div>` : `<p style="margin-top:20px;font-size:13px;color:var(--text-secondary)">👁️ Solo lectura — sin permisos de edición</p>`}
+            <button type="submit" class="btn btn-success">${this.empresa ? 'Actualizar' : 'Registrar'} Empresa</button>
+          </div>` : `<p style="margin-top:20px;font-size:13px;color:var(--text-secondary)">Solo lectura — sin permisos de edición</p>`}
         </form>
       </div>
     `;
@@ -390,17 +410,20 @@ const App = {
   viewPersonal() {
     return `
       <div class="topbar">
-        <h2>👥 Datos del Personal</h2>
-        ${this.userCan('write') ? `<button class="btn btn-primary" onclick="App.showAddEmpleado()">+ Agregar Empleado</button>` : ''}
+        <h2>Datos del Personal</h2>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="tag tag-personal">Personal</span>
+          ${this.userCan('write') ? `<button class="btn btn-primary" onclick="App.showAddEmpleado()">+ Agregar Empleado</button>` : ''}
+        </div>
       </div>
       ${this.empleados.length === 0 ? `
         <div class="empty-state">
-          <div class="icon">👤</div>
+          <div class="icon">${ICON.empty}</div>
           <h3>Sin empleados registrados</h3>
           <p>Agregue empleados para comenzar la gestión</p>
         </div>
       ` : `
-        <div class="card" data-cat="datos">
+        <div class="card" data-cat="personal">
           <div class="table-wrap">
             <table>
               <thead>
@@ -418,8 +441,8 @@ const App = {
                     <td>${emp.fecha_ingreso || '—'}</td>
                     <td><span class="status ${emp.activo ? 'status-ok' : 'status-danger'}">${emp.activo ? '● Activo' : '● Inactivo'}</span></td>
                     <td style="display:flex;gap:6px;flex-wrap:wrap">
-                      <button class="btn btn-sm btn-outline" onclick="App.navigate('gestion')">Gestión</button>
-                      ${this.userCan('delete') ? `<button class="btn btn-sm btn-danger" onclick="App.deleteEmpleado(${emp.id},'${emp.nombre_apellido}')">🗑️</button>` : ''}
+                      <button class="btn btn-sm btn-outline" onclick="App.openGestionEmpleado(${emp.id})">Gestión</button>
+                      ${this.userCan('delete') ? `<button class="btn btn-sm btn-danger" onclick="App.deleteEmpleado(${emp.id},'${emp.nombre_apellido}')">Eliminar</button>` : ''}
                     </td>
                   </tr>
                 `).join('')}
@@ -512,12 +535,29 @@ const App = {
   },
 
   // ─── GESTIÓN LABORAL ──────────────────────────
+  openGestionEmpleado(personalId) {
+    this.navigate('gestion', { personalId });
+  },
+
+  gestionEmptyState(
+    title = 'Seleccione un empleado',
+    description = 'Elija un empleado del selector para ver y editar su gestión laboral'
+  ) {
+    return `
+      <div class="empty-state">
+        <div class="icon">${ICON.empty}</div>
+        <h3>${title}</h3>
+        <p>${description}</p>
+      </div>
+    `;
+  },
+
   viewGestion() {
     if (this.empleados.length === 0) {
       return `
-        <div class="topbar"><h2>📋 Gestión Laboral</h2></div>
+        <div class="topbar"><h2>Gestión Laboral</h2></div>
         <div class="empty-state">
-          <div class="icon">📋</div>
+          <div class="icon">${ICON.empty}</div>
           <h3>Sin empleados</h3>
           <p>Registre empleados primero para gestionar su situación laboral</p>
         </div>
@@ -525,55 +565,89 @@ const App = {
     }
 
     const submodulos = [
-      { key: 'contrato', label: 'Contrato', icon: '📄' },
-      { key: 'seguridad_social', label: 'Seg. Social', icon: '🏥' },
-      { key: 'horario', label: 'Horario', icon: '⏰' },
-      { key: 'salario', label: 'Salario', icon: '💰' },
-      { key: 'vacaciones', label: 'Vacaciones', icon: '🏖️' },
-      { key: 'aguinaldo', label: 'Aguinaldo', icon: '🎁' },
+      { key: 'contrato', label: 'Contrato' },
+      { key: 'seguridad_social', label: 'Seg. Social' },
+      { key: 'horario', label: 'Horario' },
+      { key: 'salario', label: 'Salario' },
+      { key: 'vacaciones', label: 'Vacaciones' },
+      { key: 'aguinaldo', label: 'Aguinaldo' },
     ];
+    const selectedGestionId = String(this._selectedGestionPersonalId || this._currentPersonalId || '');
 
     return `
       <div class="topbar">
-        <h2>📋 Gestión Laboral</h2>
-        <span class="tag tag-gestion">Gestión</span>
+        <h2>Gestión Laboral</h2>
+        <span class="tag tag-contrato">Contratos</span>
       </div>
 
-      <div class="card" data-cat="gestion" style="margin-bottom:20px">
+      <div class="card" data-cat="contrato" style="margin-bottom:20px">
         <label style="font-size:13px;font-weight:600;color:var(--text-secondary)">Seleccionar Empleado:</label>
         <select class="form-control" id="selEmpleado" onchange="App.loadGestionEmpleado(this.value)" style="max-width:400px;margin-top:8px">
           <option value="">— Elegir empleado —</option>
-          ${this.empleados.map(e => `<option value="${e.id}">${e.nombre_apellido} (${e.cedula})</option>`).join('')}
+          ${this.empleados.map(e => `<option value="${e.id}" ${selectedGestionId === String(e.id) ? 'selected' : ''}>${e.nombre_apellido} (${e.cedula})</option>`).join('')}
         </select>
       </div>
 
       <div class="tabs">
         ${submodulos.map((s, i) => `
-          <div class="tab ${i === 0 ? 'active' : ''}" data-cat="gestion" data-tab="${s.key}" onclick="App.switchGestionTab('${s.key}')">
-            ${s.icon} ${s.label}
+          <div class="tab ${i === 0 ? 'active' : ''}" data-cat="contrato" data-tab="${s.key}" onclick="App.switchGestionTab('${s.key}')">
+            ${s.label}
           </div>
         `).join('')}
       </div>
 
       <div id="gestionContent">
-        <div class="empty-state">
-          <div class="icon">👆</div>
-          <h3>Seleccione un empleado</h3>
-          <p>Elija un empleado del selector para ver y editar su gestión laboral</p>
-        </div>
+        ${this.gestionEmptyState()}
       </div>
     `;
   },
 
+  initGestionView() {
+    const select = document.getElementById('selEmpleado');
+    const personalId = this._selectedGestionPersonalId || this._currentPersonalId;
+    if (!select) return;
+
+    if (!personalId) {
+      select.value = '';
+      return;
+    }
+
+    const existeEmpleado = this.empleados.some(emp => String(emp.id) === String(personalId));
+    if (!existeEmpleado) {
+      this._selectedGestionPersonalId = null;
+      this._currentPersonalId = null;
+      this._currentGestion = null;
+      select.value = '';
+      const container = document.getElementById('gestionContent');
+      if (container) container.innerHTML = this.gestionEmptyState();
+      return;
+    }
+
+    select.value = String(personalId);
+    this.loadGestionEmpleado(String(personalId));
+  },
+
   async loadGestionEmpleado(personalId) {
-    if (!personalId) return;
+    if (!personalId) {
+      this._selectedGestionPersonalId = null;
+      this._currentPersonalId = null;
+      this._currentGestion = null;
+      const container = document.getElementById('gestionContent');
+      if (container) container.innerHTML = this.gestionEmptyState();
+      return;
+    }
+
+    const normalizedPersonalId = String(personalId);
     try {
       if (!this._gestionSchema) {
         this._gestionSchema = await API.schemas.get('C_gestion_laboral.json');
       }
-      const data = await API.gestion.get(personalId);
+      const data = await API.gestion.get(normalizedPersonalId);
       this._currentGestion = data;
-      this._currentPersonalId = personalId;
+      this._currentPersonalId = normalizedPersonalId;
+      this._selectedGestionPersonalId = normalizedPersonalId;
+      const select = document.getElementById('selEmpleado');
+      if (select) select.value = normalizedPersonalId;
       this.switchGestionTab('contrato');
     } catch (err) {
       this.showToast('Error cargando gestión', 'danger');
@@ -610,10 +684,10 @@ const App = {
     const fields  = Object.values(pasos).map(cfg => this._renderGestionField(cfg, data[cfg.campo])).join('');
 
     container.innerHTML = `
-      <div class="card" data-cat="gestion">
+      <div class="card" data-cat="contrato">
         <div class="card-header">
           <h3>${TAB_NOMBRES[tab]}</h3>
-          ${this.userCan('write') ? `<button class="btn btn-sm btn-success" onclick="App.saveGestionTab('${tab}')">💾 Guardar</button>` : ''}
+          ${this.userCan('write') ? `<button class="btn btn-sm btn-success" onclick="App.saveGestionTab('${tab}')">Guardar</button>` : ''}
         </div>
         <div id="gestionFields">
           <div class="grid-2" style="align-items:start">
@@ -714,14 +788,14 @@ const App = {
   viewHerramientas() {
     return `
       <div class="topbar">
-        <h2>🛠️ Herramientas</h2>
-        <span class="tag tag-herramientas">Herramientas</span>
+        <h2>Herramientas</h2>
+        <span class="tag tag-carga">Carga de datos</span>
       </div>
 
       <div class="tabs">
-        <div class="tab active" data-cat="herramientas" onclick="App.showHerramienta('liquidacion')">📊 Calculadora Liquidación</div>
-        <div class="tab" data-cat="herramientas" onclick="App.showHerramienta('cuantificacion')">📋 Cuantificación</div>
-        <div class="tab" data-cat="herramientas" onclick="App.showHerramienta('ahorro')">💰 Ahorro Aguinaldo</div>
+        <div class="tab active" data-cat="carga" onclick="App.showHerramienta('liquidacion')">Calculadora Liquidación</div>
+        <div class="tab" data-cat="carga" onclick="App.showHerramienta('cuantificacion')">Cuantificación</div>
+        <div class="tab" data-cat="carga" onclick="App.showHerramienta('ahorro')">Ahorro Aguinaldo</div>
       </div>
 
       <div id="herramientaContent">
@@ -743,7 +817,7 @@ const App = {
 
   viewLiquidacion() {
     return `
-      <div class="card" data-cat="herramientas">
+      <div class="card" data-cat="carga">
         <h3 style="margin-bottom:16px">Planilla de Liquidación Final</h3>
         <form onsubmit="App.calcularLiquidacion(event)">
           <div class="grid-3">
@@ -792,7 +866,7 @@ const App = {
               <input class="form-control" name="salario_mes_pendiente" type="number" value="0">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top:12px">📊 Calcular Liquidación</button>
+          <button type="submit" class="btn btn-primary" style="margin-top:12px">Calcular Liquidación</button>
         </form>
         <div id="resultadoLiquidacion"></div>
       </div>
@@ -833,7 +907,7 @@ const App = {
 
   viewCuantificacion() {
     return `
-      <div class="card" data-cat="herramientas">
+      <div class="card" data-cat="carga">
         <h3 style="margin-bottom:12px">Cuantificación de Incumplimientos</h3>
         <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px">
           Seleccione un empleado para ver el resumen de cumplimiento de su gestión laboral.
@@ -889,7 +963,7 @@ const App = {
 
   viewAhorro() {
     return `
-      <div class="card" data-cat="herramientas">
+      <div class="card" data-cat="carga">
         <h3 style="margin-bottom:12px">Ahorro Programado para Aguinaldo</h3>
         <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px">
           Planifique el ahorro mensual para cubrir el aguinaldo de fin de año de cada empleado.
@@ -912,7 +986,7 @@ const App = {
               <input class="form-control" name="meses_trabajados" type="number" value="12" min="1" max="12">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">📊 Calcular Ahorro</button>
+          <button type="submit" class="btn btn-primary">Calcular Ahorro</button>
         </form>
         <div id="resultadoAhorro"></div>
       </div>
@@ -952,20 +1026,19 @@ const App = {
   viewAlertas() {
     return `
       <div class="topbar">
-        <h2>🔔 Notificaciones y Alertas</h2>
-        <span class="tag tag-gestion">Gestión</span>
+        <h2>Notificaciones y Alertas</h2>
+        <span class="tag tag-alerta">Alertas</span>
       </div>
       ${this.alertas.length === 0 ? `
         <div class="empty-state">
-          <div class="icon">✅</div>
+          <div class="icon">${ICON.empty}</div>
           <h3>Sin alertas</h3>
           <p>No hay incumplimientos detectados. ¡Excelente!</p>
         </div>
       ` : `
-        <div class="card" data-cat="gestion">
+        <div class="card" data-cat="alerta">
           ${this.alertas.map(a => `
             <div class="alert-item ${a.nivel}" style="opacity:${a.leida ? '0.5' : '1'}">
-              <span style="font-size:18px">${a.nivel === 'danger' ? '🔴' : a.nivel === 'warning' ? '🟡' : 'ℹ️'}</span>
               <div style="flex:1">
                 <div><strong>${a.mensaje}</strong></div>
                 <div class="time">Módulo: ${a.modulo || '—'} · ${a.created_at}</div>
@@ -993,10 +1066,10 @@ const App = {
     return `
       <div class="topbar"><h2>${titulo}</h2></div>
       <div class="empty-state">
-        <div class="icon">🚧</div>
+        <div class="icon">${ICON.empty}</div>
         <h3>Próximamente</h3>
         <p>${descripcion}</p>
-        <div class="proximamente" style="margin-top:16px">🔒 En desarrollo</div>
+        <div class="proximamente" style="margin-top:16px">En desarrollo</div>
       </div>
     `;
   },
@@ -1034,17 +1107,17 @@ const App = {
   // ─── USUARIOS (admin) ──────────────────────────
   viewUsuarios() {
     const ROL_BADGE = {
-      admin:  '<span class="status status-ok">🔑 Admin</span>',
-      editor: '<span class="status" style="background:rgba(52,152,219,0.15);color:#3498db">✏️ Editor</span>',
-      viewer: '<span class="status" style="background:rgba(90,96,112,0.12);color:#5a6070">👁️ Viewer</span>',
+      admin:  '<span class="status status-ok">Admin</span>',
+      editor: '<span class="status" style="background:rgba(52,152,219,0.15);color:#3498db">Editor</span>',
+      viewer: '<span class="status" style="background:rgba(90,96,112,0.12);color:#5a6070">Viewer</span>',
     };
 
     return `
       <div class="topbar">
-        <h2>👤 Usuarios del Sistema</h2>
+        <h2>Usuarios del Sistema</h2>
         <button class="btn btn-primary" onclick="App.showModalUsuario()">+ Nuevo Usuario</button>
       </div>
-      <div class="card" data-cat="soporte">
+      <div class="card" data-cat="admin">
         <div id="tablaUsuarios" class="table-wrap">
           <p style="color:var(--text-secondary);font-size:13px">Cargando...</p>
         </div>
@@ -1073,9 +1146,9 @@ const App = {
               <div class="form-group">
                 <label>Rol</label>
                 <select class="form-control" id="usuarioRol" name="rol" required>
-                  <option value="viewer">👁️ Viewer — Solo lectura</option>
-                  <option value="editor">✏️ Editor — Crear y editar</option>
-                  <option value="admin">🔑 Admin — Acceso total</option>
+                  <option value="viewer">Viewer — Solo lectura</option>
+                  <option value="editor">Editor — Crear y editar</option>
+                  <option value="admin">Admin — Acceso total</option>
                 </select>
               </div>
             </div>
@@ -1093,9 +1166,9 @@ const App = {
     try {
       const usuarios = await API.auth.usuarios.list();
       const ROL_BADGE = {
-        admin:  '<span class="status status-ok" style="font-size:11px">🔑 Admin</span>',
-        editor: '<span class="status" style="background:rgba(52,152,219,0.15);color:#3498db;font-size:11px">✏️ Editor</span>',
-        viewer: '<span class="status" style="background:rgba(90,96,112,0.12);color:#5a6070;font-size:11px">👁️ Viewer</span>',
+        admin:  '<span class="status status-ok" style="font-size:11px">Admin</span>',
+        editor: '<span class="status" style="background:rgba(52,152,219,0.15);color:#3498db;font-size:11px">Editor</span>',
+        viewer: '<span class="status" style="background:rgba(90,96,112,0.12);color:#5a6070;font-size:11px">Viewer</span>',
       };
       document.getElementById('tablaUsuarios').innerHTML = `
         <table>
@@ -1111,8 +1184,8 @@ const App = {
                 <td><span class="status ${u.activo ? 'status-ok' : 'status-danger'}">${u.activo ? '● Activo' : '● Inactivo'}</span></td>
                 <td style="font-size:12px;color:var(--text-secondary)">${u.created_at?.split(' ')[0] || '—'}</td>
                 <td style="display:flex;gap:6px">
-                  <button class="btn btn-sm btn-outline" onclick="App.showModalUsuario(${JSON.stringify(u).replace(/"/g,'&quot;')})">✏️ Editar</button>
-                  ${u.id !== App.user.id ? `<button class="btn btn-sm btn-danger" onclick="App.deleteUsuario(${u.id},'${u.username}')">🗑️</button>` : ''}
+                  <button class="btn btn-sm btn-outline" onclick="App.showModalUsuario(${JSON.stringify(u).replace(/"/g,'&quot;')})">Editar</button>
+                  ${u.id !== App.user.id ? `<button class="btn btn-sm btn-danger" onclick="App.deleteUsuario(${u.id},'${u.username}')">Eliminar</button>` : ''}
                 </td>
               </tr>
             `).join('')}
