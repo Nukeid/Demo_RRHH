@@ -41,16 +41,15 @@ const DEMO = (() => {
     aguinaldo:        { pagado_anio_anterior: 'Sí', monto_pagado: '3500000', fecha_pago: '2025-12-01' },
   });
 
+  // Misma forma que /gestion/resumen del backend real (charts + cuantificación)
   const mockResumen = () => ({
-    total_general: 78,
-    modulos: {
-      contrato:         { nombre: 'Contrato',          cumplimiento: 90 },
-      seguridad_social: { nombre: 'IPS',               cumplimiento: 85 },
-      horario:          { nombre: 'Horario',            cumplimiento: 75 },
-      salario:          { nombre: 'Salario',            cumplimiento: 70 },
-      vacaciones:       { nombre: 'Vacaciones',         cumplimiento: 60 },
-      aguinaldo:        { nombre: 'Aguinaldo',          cumplimiento: 88 },
-    },
+    contrato:         { pasos_completados: 9, pasos_faltantes: 1, porcentaje: 90 },
+    seguridad_social: { pasos_completados: 6, pasos_faltantes: 1, porcentaje: 86 },
+    horario:          { pasos_completados: 6, pasos_faltantes: 2, porcentaje: 75 },
+    salario:          { pasos_completados: 7, pasos_faltantes: 3, porcentaje: 70 },
+    vacaciones:       { pasos_completados: 3, pasos_faltantes: 2, porcentaje: 60 },
+    aguinaldo:        { pasos_completados: 7, pasos_faltantes: 1, porcentaje: 88 },
+    total_general:    { pasos_completados: 38, pasos_faltantes: 10, porcentaje: 79, total_incumplimientos: 10 },
   });
 
   // ── Ruteo de paths mock ────────────────────────

@@ -126,7 +126,7 @@ function initTables() {
       fecha_elaboracion     TEXT,
       datos_json            TEXT DEFAULT '{}',
       created_at            TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (personal_id) REFERENCES personal(id)
+      FOREIGN KEY (personal_id) REFERENCES personal(id) ON DELETE CASCADE
     );
   `);
 
@@ -145,7 +145,7 @@ function initTables() {
       ahorro_acumulado  REAL DEFAULT 0,
       aguinaldo_total   REAL DEFAULT 0,
       created_at        TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (personal_id) REFERENCES personal(id),
+      FOREIGN KEY (personal_id) REFERENCES personal(id) ON DELETE CASCADE,
       UNIQUE(personal_id, anio)
     );
   `);

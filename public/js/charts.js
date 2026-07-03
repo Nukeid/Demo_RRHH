@@ -1,5 +1,24 @@
 // ─── Charts Helper para NogueraRRHH ─────────────
+if (typeof Chart !== 'undefined') {
+  Chart.defaults.font.family = "'Nunito', system-ui, sans-serif";
+  Chart.defaults.font.size = 12;
+}
+
 const Charts = {
+
+  // Canvas no resuelve var(--x): leer el valor computado del tema actual
+  cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  },
+
+  theme() {
+    return {
+      text:  this.cssVar('--text-primary')   || '#131726',
+      muted: this.cssVar('--text-secondary') || '#5a6478',
+      grid:  this.cssVar('--border-color')   || '#e5e9f0',
+      bg:    this.cssVar('--bg-secondary')   || '#ffffff',
+    };
+  },
 
   // Colores por módulo
   colors: {
@@ -15,6 +34,7 @@ const Charts = {
   cumplimientoDonut(canvasId, resumen) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
+    const t = this.theme();
     const comp = resumen.total_general?.pasos_completados || 0;
     const falt = resumen.total_general?.pasos_faltantes || 0;
 
@@ -26,14 +46,14 @@ const Charts = {
           data: [comp, falt],
           backgroundColor: ['#5cb89a', '#e85d4a'],
           borderWidth: 2,
-          borderColor: 'var(--bg-primary)',
+          borderColor: t.bg,
         }]
       },
       options: {
         responsive: true,
         cutout: '65%',
         plugins: {
-          legend: { position: 'bottom', labels: { color: 'var(--text-primary)', padding: 16 } },
+          legend: { position: 'bottom', labels: { color: t.text, padding: 16 } },
           tooltip: {
             callbacks: {
               label: (ctx) => `${ctx.label}: ${ctx.raw} pasos`
@@ -48,6 +68,7 @@ const Charts = {
   cumplimientoBarras(canvasId, resumen) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
+    const t = this.theme();
 
     const modulos = ['contrato', 'seguridad_social', 'horario', 'salario', 'vacaciones', 'aguinaldo'];
     const labels = ['Contrato', 'Seg. Social', 'Horario', 'Salario', 'Vacaciones', 'Aguinaldo'];
@@ -63,6 +84,8 @@ const Charts = {
             backgroundColor: modulos.map(m => Charts.colors[m]?.bg || '#ccc'),
             borderColor: modulos.map(m => Charts.colors[m]?.border || '#999'),
             borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
           },
           {
             label: 'Faltantes',
@@ -70,17 +93,19 @@ const Charts = {
             backgroundColor: 'rgba(232,93,74,0.3)',
             borderColor: '#e85d4a',
             borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
           }
         ]
       },
       options: {
         responsive: true,
         scales: {
-          y: { beginAtZero: true, ticks: { stepSize: 1, color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } },
-          x: { ticks: { color: 'var(--text-secondary)' }, grid: { display: false } }
+          y: { beginAtZero: true, ticks: { stepSize: 1, color: t.muted }, grid: { color: t.grid } },
+          x: { ticks: { color: t.muted }, grid: { display: false } }
         },
         plugins: {
-          legend: { labels: { color: 'var(--text-primary)' } }
+          legend: { labels: { color: t.text } }
         }
       }
     });
@@ -90,6 +115,7 @@ const Charts = {
   cumplimientoRadar(canvasId, resumen) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
+    const t = this.theme();
 
     const modulos = ['contrato', 'seguridad_social', 'horario', 'salario', 'vacaciones', 'aguinaldo'];
     const labels = ['Contrato', 'Seg. Social', 'Horario', 'Salario', 'Vacaciones', 'Aguinaldo'];
@@ -114,9 +140,9 @@ const Charts = {
           r: {
             beginAtZero: true,
             max: 100,
-            ticks: { stepSize: 25, color: 'var(--text-secondary)' },
-            grid: { color: 'var(--border-color)' },
-            pointLabels: { color: 'var(--text-primary)', font: { size: 12 } }
+            ticks: { stepSize: 25, color: t.muted, backdropColor: 'transparent' },
+            grid: { color: t.grid },
+            pointLabels: { color: t.text, font: { size: 12 } }
           }
         },
         plugins: {
@@ -127,9 +153,51 @@ const Charts = {
   },
 
   // Barras de ahorro aguinaldo por mes
+  // Barra horizontal de distribución temporal (diaria / mensual / anual)
+  timelineBar(canvasId, buckets, accent = '#0ea5e9') {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    const t = this.theme();
+
+    return new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: buckets.map(b => b.label),
+        datasets: [{
+          label: 'Registros',
+          data: buckets.map(b => b.count),
+          backgroundColor: accent + '59',
+          borderColor: accent,
+          borderWidth: 1.5,
+          borderRadius: 10,
+          borderSkipped: false,
+          maxBarThickness: 26,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: t.muted }, grid: { color: t.grid } },
+          y: { ticks: { color: t.text }, grid: { display: false } },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (c) => ` ${c.raw} registro${c.raw === 1 ? '' : 's'}`
+            }
+          }
+        }
+      }
+    });
+  },
+
   ahorroAguinaldoBarras(canvasId, datosAhorro) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
+    const t = this.theme();
 
     const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const mesesKeys = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -148,11 +216,11 @@ const Charts = {
       options: {
         responsive: true,
         scales: {
-          y: { beginAtZero: true, ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } },
-          x: { ticks: { color: 'var(--text-secondary)' }, grid: { display: false } },
+          y: { beginAtZero: true, ticks: { color: t.muted }, grid: { color: t.grid } },
+          x: { ticks: { color: t.muted }, grid: { display: false } },
         },
         plugins: {
-          legend: { labels: { color: 'var(--text-primary)' } },
+          legend: { labels: { color: t.text } },
           tooltip: {
             callbacks: {
               label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString('es-PY')} Gs.`

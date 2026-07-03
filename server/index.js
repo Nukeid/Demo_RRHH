@@ -12,7 +12,7 @@ const gestionRoutes     = require('./routes/gestion');
 const herramientasRoutes = require('./routes/herramientas');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // ─── Middleware global ─────────────────────────
 app.use(cors());

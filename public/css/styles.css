@@ -4,7 +4,7 @@
    de la gestión laboral tiene su color de identidad.
    ════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Questrial&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
   /* ── Acentos por dominio (tema claro) ───────────
@@ -41,8 +41,9 @@
   --danger:   #ef4444;
   --info:     #0ea5e9;
 
-  --radius:    14px;
-  --radius-sm: 10px;
+  --radius:    20px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
   --ease:      cubic-bezier(.4, 0, .2, 1);
 }
 
@@ -89,7 +90,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Questrial', system-ui, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -98,7 +99,7 @@ body {
   transition: background 0.3s var(--ease), color 0.3s var(--ease);
 }
 
-h1, h2, h3, h4 { font-family: 'Questrial', system-ui, sans-serif; }
+h1, h2, h3, h4 { font-family: 'Nunito', system-ui, sans-serif; }
 
 ::selection { background: color-mix(in srgb, var(--info) 25%, transparent); }
 
@@ -328,6 +329,7 @@ h1, h2, h3, h4 { font-family: 'Questrial', system-ui, sans-serif; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   margin-bottom: 18px;
   gap: 12px;
 }
@@ -367,7 +369,7 @@ h1, h2, h3, h4 { font-family: 'Questrial', system-ui, sans-serif; }
   content: '';
   position: absolute;
   top: 0; right: 0;
-  width: 90px; height: 90px;
+  width: 1100px; height: 105px;
   background: radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
   pointer-events: none;
 }
@@ -379,7 +381,7 @@ h1, h2, h3, h4 { font-family: 'Questrial', system-ui, sans-serif; }
   line-height: 1.1;
 }
 .kpi .label {
-  font-family: 'Questrial', system-ui, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   font-size: 11px;
   color: var(--text-secondary);
   margin-top: 6px;
@@ -436,13 +438,14 @@ select.form-control { cursor: pointer; }
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 11px 20px;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   cursor: pointer;
   transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease),
               background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
@@ -508,7 +511,7 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
 th {
   text-align: left;
-  font-family: 'Questrial', system-ui, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -607,13 +610,13 @@ tr:hover td { background: color-mix(in srgb, var(--info) 5%, transparent); }
 .progress-bar {
   height: 8px;
   background: var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .progress-bar .fill {
   height: 100%;
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   transition: width 0.6s var(--ease);
 }
 
@@ -623,6 +626,60 @@ tr:hover td { background: color-mix(in srgb, var(--info) 5%, transparent); }
 
 /* ── Charts container ────────────────────────────── */
 .chart-container { position: relative; height: 280px; width: 100%; }
+
+/* ── Línea de tiempo (vistas con filtro de fechas) ─ */
+.timeline-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.timeline-toolbar .form-group { margin-bottom: 0; }
+.timeline-toolbar .form-control { min-width: 150px; }
+
+.timeline-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-bottom: 10px;
+  white-space: nowrap;
+}
+
+/* Selector de granularidad: Diario · Mensual · Anual */
+.gran-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+}
+.gran-tab {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.gran-tab:hover { color: var(--text-primary); }
+.gran-tab.active {
+  background: color-mix(in srgb, var(--accent, var(--info)) 16%, var(--bg-secondary));
+  color: var(--accent-ink, var(--text-primary));
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-chart { position: relative; width: 100%; height: 200px; }
+
+@media (max-width: 768px) {
+  .timeline-count { margin-left: 0; }
+}
 
 /* ── Empty state ─────────────────────────────────── */
 .empty-state {
@@ -666,7 +723,7 @@ tr:hover td { background: color-mix(in srgb, var(--info) 5%, transparent); }
 .modal {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 18px;
+  border-radius: 24px;
   padding: 32px;
   max-width: 600px;
   width: 90%;

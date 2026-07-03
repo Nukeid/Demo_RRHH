@@ -97,8 +97,19 @@ router.put('/:id', (req, res) => {
 // DELETE
 router.delete('/:id', (req, res) => {
   const db = getDb();
-  db.prepare('DELETE FROM personal WHERE id = ?').run(req.params.id);
-  res.json({ message: 'Empleado eliminado' });
+  try {
+    const deleteCascade = db.transaction((id) => {
+      // liquidaciones y ahorro_aguinaldo no tienen ON DELETE CASCADE en su FK
+      db.prepare('DELETE FROM liquidaciones WHERE personal_id = ?').run(id);
+      db.prepare('DELETE FROM ahorro_aguinaldo WHERE personal_id = ?').run(id);
+      db.prepare('DELETE FROM alertas WHERE personal_id = ?').run(id);
+      db.prepare('DELETE FROM personal WHERE id = ?').run(id);
+    });
+    deleteCascade(req.params.id);
+    res.json({ message: 'Empleado eliminado' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 module.exports = router;

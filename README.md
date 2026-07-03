@@ -58,5 +58,5 @@ noguera-rrhh/
 cd noguera-rrhh
 npm install
 npm start
-# Abrir http://localhost:3000
+# Abrir http://localhost:8080
 ```

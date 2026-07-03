@@ -27,7 +27,7 @@ npm install
 npm start
 ```
 
-El servidor arranca en **http://localhost:3000** y crea automáticamente la base de datos SQLite en `./data/noguera.db`.
+El servidor arranca en **http://localhost:8080** y crea automáticamente la base de datos SQLite en `./data/noguera.db`.
 
 ---
 
@@ -78,7 +78,7 @@ SELECT * FROM alertas WHERE leida = 0;  -- alertas pendientes
 
 ## 4. API Endpoints Disponibles
 
-Base URL: `http://localhost:3000/api`
+Base URL: `http://localhost:8080/api`
 
 ### Empresa
 | Método | Ruta              | Descripción        |
@@ -151,7 +151,7 @@ GET /api/gestion/alertas/1
 ### Ejemplo con Claude (MCP o API):
 ```javascript
 // El agente puede hacer fetch a cualquier endpoint
-const response = await fetch("http://localhost:3000/api/gestion/resumen/3");
+const response = await fetch("http://localhost:8080/api/gestion/resumen/3");
 const resumen = await response.json();
 // El agente analiza el resumen y sugiere correcciones
 ```
@@ -165,7 +165,7 @@ const resumen = await response.json();
 # 1. Crear cuenta en railway.app
 # 2. Conectar repo de GitHub
 # 3. Railway detecta Node.js automáticamente
-# 4. Variables: PORT=3000
+# 4. Variables: PORT=8080
 # 5. Deploy automático
 ```
 
@@ -201,7 +201,7 @@ server {
     server_name tudominio.com;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -241,7 +241,7 @@ Para cargar datos de demo vía terminal:
 
 ```bash
 # Crear empresa
-curl -X POST http://localhost:3000/api/empresa \
+curl -X POST http://localhost:8080/api/empresa \
   -H "Content-Type: application/json" \
   -d '{
     "ruc": "80012345-6",
@@ -254,7 +254,7 @@ curl -X POST http://localhost:3000/api/empresa \
   }'
 
 # Crear empleado
-curl -X POST http://localhost:3000/api/personal \
+curl -X POST http://localhost:8080/api/personal \
   -H "Content-Type: application/json" \
   -d '{
     "empresa_id": 1,
@@ -266,7 +266,7 @@ curl -X POST http://localhost:3000/api/personal \
   }'
 
 # Registrar gestión laboral (contrato)
-curl -X PUT http://localhost:3000/api/gestion/laboral/1/contrato \
+curl -X PUT http://localhost:8080/api/gestion/laboral/1/contrato \
   -H "Content-Type: application/json" \
   -d '{
     "relacion_juridica": "Individual",
@@ -288,7 +288,7 @@ curl -X PUT http://localhost:3000/api/gestion/laboral/1/contrato \
 | Problema | Solución |
 |----------|----------|
 | `Error: Cannot find module 'better-sqlite3'` | Ejecutar `npm install` de nuevo |
-| Puerto 3000 ocupado | Cambiar: `PORT=4000 npm start` |
+| Puerto 8080 ocupado | Cambiar: `PORT=4000 npm start` |
 | BD corrupta | Eliminar `data/noguera.db` y reiniciar |
 | Error CORS | Ya está habilitado con `cors()` middleware |
 | Charts no cargan | Verificar que Chart.js CDN sea accesible |

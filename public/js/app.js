@@ -16,6 +16,7 @@ const App = {
   empleados: [],
   alertas: [],
   charts: {},
+  _dateFilters: {},
   _selectedGestionPersonalId: null,
   _currentPersonalId: null,
   _currentGestion: null,
@@ -129,6 +130,8 @@ const App = {
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
       this.updateThemeIcon();
+      // Los charts pintan colores del tema al crearse: re-render para actualizarlos
+      if (this.user) this.render(this.currentView);
     });
     this.updateThemeIcon();
   },
@@ -406,8 +409,106 @@ const App = {
     }
   },
 
+  // ─── FILTRO DE FECHAS + LÍNEA DE TIEMPO ───────
+  MESES_CORTOS: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+
+  getDateFilter(key) {
+    if (!this._dateFilters[key]) this._dateFilters[key] = { desde: '', hasta: '', gran: 'mensual' };
+    return this._dateFilters[key];
+  },
+
+  setDateFilter(key, field, value) {
+    this.getDateFilter(key)[field] = value;
+    this.render(this.currentView);
+  },
+
+  clearDateFilter(key) {
+    const gran = this.getDateFilter(key).gran;
+    this._dateFilters[key] = { desde: '', hasta: '', gran };
+    this.render(this.currentView);
+  },
+
+  filterByDate(items, dateProp, f) {
+    if (!f.desde && !f.hasta) return items;
+    return items.filter(it => {
+      const d = String(it[dateProp] || '').slice(0, 10);
+      if (!d) return false;
+      if (f.desde && d < f.desde) return false;
+      if (f.hasta && d > f.hasta) return false;
+      return true;
+    });
+  },
+
+  // Agrupa registros por día / mes / año según granularidad
+  bucketizeByDate(items, dateProp, gran) {
+    const map = new Map();
+    items.forEach(it => {
+      const d = String(it[dateProp] || '').slice(0, 10);
+      if (d.length < 10) return;
+      const key = gran === 'diario' ? d : gran === 'anual' ? d.slice(0, 4) : d.slice(0, 7);
+      map.set(key, (map.get(key) || 0) + 1);
+    });
+    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([key, count]) => {
+      const [y, m, day] = key.split('-');
+      const label = gran === 'anual' ? y
+                  : gran === 'mensual' ? `${this.MESES_CORTOS[Number(m) - 1]} ${y}`
+                  : `${day} ${this.MESES_CORTOS[Number(m) - 1]} ${y}`;
+      return { label, count };
+    });
+  },
+
+  renderTimelineCard(key, cat, title, canvasId, shown, total) {
+    const f = this.getDateFilter(key);
+    const GRANS = [['diario', 'Diario'], ['mensual', 'Mensual'], ['anual', 'Anual']];
+    return `
+      <div class="card" data-cat="${cat}">
+        <div class="card-header">
+          <h3>${title}</h3>
+          <div class="gran-tabs">
+            ${GRANS.map(([g, label]) => `
+              <button type="button" class="gran-tab ${f.gran === g ? 'active' : ''}"
+                onclick="App.setDateFilter('${key}','gran','${g}')">${label}</button>
+            `).join('')}
+          </div>
+        </div>
+        <div class="timeline-toolbar">
+          <div class="form-group">
+            <label>Desde</label>
+            <input type="date" class="form-control" value="${f.desde}"
+              onchange="App.setDateFilter('${key}','desde',this.value)">
+          </div>
+          <div class="form-group">
+            <label>Hasta</label>
+            <input type="date" class="form-control" value="${f.hasta}"
+              onchange="App.setDateFilter('${key}','hasta',this.value)">
+          </div>
+          ${f.desde || f.hasta ? `<button class="btn btn-sm btn-outline" onclick="App.clearDateFilter('${key}')">Limpiar filtro</button>` : ''}
+          <span class="timeline-count">${shown} de ${total} registros</span>
+        </div>
+        <div class="timeline-chart" id="${canvasId}Wrap"><canvas id="${canvasId}"></canvas></div>
+      </div>
+    `;
+  },
+
+  initTimelineChart(key, canvasId, items, dateProp, accentVar) {
+    const f = this.getDateFilter(key);
+    const buckets = this.bucketizeByDate(this.filterByDate(items, dateProp, f), dateProp, f.gran);
+    const wrap = document.getElementById(canvasId + 'Wrap');
+    if (!wrap) return;
+    if (buckets.length === 0) {
+      wrap.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;padding:8px 0">Sin registros con fecha en el rango seleccionado.</p>';
+      wrap.style.height = 'auto';
+      return;
+    }
+    wrap.style.height = Math.min(460, Math.max(150, buckets.length * 38 + 70)) + 'px';
+    const accent = Charts.cssVar(accentVar) || '#0ea5e9';
+    this.charts[key + 'Timeline'] = Charts.timelineBar(canvasId, buckets, accent);
+  },
+
   // ─── PERSONAL ─────────────────────────────────
   viewPersonal() {
+    const f = this.getDateFilter('personal');
+    const filtrados = this.filterByDate(this.empleados, 'fecha_ingreso', f);
     return `
       <div class="topbar">
         <h2>Datos del Personal</h2>
@@ -423,7 +524,13 @@ const App = {
           <p>Agregue empleados para comenzar la gestión</p>
         </div>
       ` : `
+        ${this.renderTimelineCard('personal', 'personal', 'Ingresos en el tiempo', 'tlPersonal', filtrados.length, this.empleados.length)}
         <div class="card" data-cat="personal">
+          ${filtrados.length === 0 ? `
+            <p style="color:var(--text-secondary);font-size:13px;padding:8px 0">
+              Ningún empleado ingresó en el rango de fechas seleccionado.
+            </p>
+          ` : `
           <div class="table-wrap">
             <table>
               <thead>
@@ -433,7 +540,7 @@ const App = {
                 </tr>
               </thead>
               <tbody>
-                ${this.empleados.map(emp => `
+                ${filtrados.map(emp => `
                   <tr>
                     <td><strong>${emp.nombre_apellido}</strong></td>
                     <td style="font-family:'JetBrains Mono',monospace;font-size:13px">${emp.cedula}</td>
@@ -449,6 +556,7 @@ const App = {
               </tbody>
             </table>
           </div>
+          `}
         </div>
       `}
       <div class="modal-overlay" id="modalEmpleado">
@@ -1024,6 +1132,8 @@ const App = {
 
   // ─── ALERTAS ──────────────────────────────────
   viewAlertas() {
+    const f = this.getDateFilter('alertas');
+    const filtradas = this.filterByDate(this.alertas, 'created_at', f);
     return `
       <div class="topbar">
         <h2>Notificaciones y Alertas</h2>
@@ -1036,8 +1146,13 @@ const App = {
           <p>No hay incumplimientos detectados. ¡Excelente!</p>
         </div>
       ` : `
+        ${this.renderTimelineCard('alertas', 'alerta', 'Alertas en el tiempo', 'tlAlertas', filtradas.length, this.alertas.length)}
         <div class="card" data-cat="alerta">
-          ${this.alertas.map(a => `
+          ${filtradas.length === 0 ? `
+            <p style="color:var(--text-secondary);font-size:13px;padding:8px 0">
+              Sin alertas en el rango de fechas seleccionado.
+            </p>
+          ` : filtradas.map(a => `
             <div class="alert-item ${a.nivel}" style="opacity:${a.leida ? '0.5' : '1'}">
               <div style="flex:1">
                 <div><strong>${a.mensaje}</strong></div>
@@ -1084,11 +1199,33 @@ const App = {
           this.charts.donut = Charts.cumplimientoDonut('chartDonut', resumen);
           this.charts.radar = Charts.cumplimientoRadar('chartRadar', resumen);
           this.charts.barras = Charts.cumplimientoBarras('chartBarras', resumen);
+        } else {
+          this._chartsPlaceholder();
         }
       } catch (e) {
-        // No data yet — charts will be empty
+        this._chartsPlaceholder();
       }
     }
+
+    if (view === 'personal' && this.empleados.length > 0) {
+      this.initTimelineChart('personal', 'tlPersonal', this.empleados, 'fecha_ingreso', '--c-personal');
+    }
+
+    if (view === 'alertas' && this.alertas.length > 0) {
+      this.initTimelineChart('alertas', 'tlAlertas', this.alertas, 'created_at', '--c-alerta');
+    }
+  },
+
+  // Sin datos de gestión aún: mensaje en lugar de cajas vacías
+  _chartsPlaceholder() {
+    document.querySelectorAll('.chart-container').forEach(c => {
+      c.style.height = 'auto';
+      c.innerHTML = `
+        <div style="padding:32px 16px;text-align:center;color:var(--text-secondary);font-size:13px">
+          Sin datos de cumplimiento aún.<br>
+          Complete la <a href="#" onclick="App.navigate('gestion');return false" style="color:var(--info);font-weight:600">Gestión Laboral</a> para ver estas métricas.
+        </div>`;
+    });
   },
 
   // ─── DELETE EMPLEADO ──────────────────────────
