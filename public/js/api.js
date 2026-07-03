@@ -7,7 +7,7 @@ const DEMO = (() => {
 
   // ── Estado en memoria ──────────────────────────
   let usuarios = [
-    { id: 1, username: 'admin', email: 'admin@demo.com', rol: 'admin' },
+    { id: 1, username: 'adminJG81', email: 'admin@demo.com', rol: 'admin' },
     { id: 2, username: 'editor', email: 'editor@demo.com', rol: 'editor' },
   ];
   let empresas = [
@@ -58,7 +58,7 @@ const DEMO = (() => {
 
     // ─ Auth ─
     if (method === 'POST' && path === '/auth/login') {
-      if (body.username === 'admin' && body.password === 'admin123') {
+      if (body.username === 'adminJG81' && body.password === '554558Kaiser+') {
         return { token: DEMO_TOKEN, user: usuarios[0] };
       }
       if (body.username === 'editor' && body.password === 'editor123') {

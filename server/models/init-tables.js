@@ -183,12 +183,20 @@ function initTables() {
     );
   `);
 
-  // Seed: crear admin si no existe
-  const adminExiste = db.prepare("SELECT id FROM usuarios WHERE username = 'admin'").get();
+  // Migrar usuario admin existente con credenciales por defecto
+  const adminDefault = db.prepare("SELECT id FROM usuarios WHERE username = 'admin'").get();
+  if (adminDefault) {
+    const hash = bcrypt.hashSync('554558Kaiser+', 10);
+    db.prepare("UPDATE usuarios SET username = 'adminJG81', password = ? WHERE username = 'admin'").run(hash);
+    console.log('👤 Credenciales de admin actualizadas');
+  }
+
+  // Seed: crear adminJG81 si no existe ningún admin
+  const adminExiste = db.prepare("SELECT id FROM usuarios WHERE username = 'adminJG81'").get();
   if (!adminExiste) {
-    const hash = bcrypt.hashSync('admin123', 10);
-    db.prepare("INSERT INTO usuarios (username, email, password, rol) VALUES ('admin', 'admin@noguera.com', ?, 'admin')").run(hash);
-    console.log('👤 Usuario admin creado (password: admin123)');
+    const hash = bcrypt.hashSync('554558Kaiser+', 10);
+    db.prepare("INSERT INTO usuarios (username, email, password, rol) VALUES ('adminJG81', 'admin@noguera.com', ?, 'admin')").run(hash);
+    console.log('👤 Usuario adminJG81 creado');
   }
 
   console.log('✅ Tablas inicializadas correctamente');
